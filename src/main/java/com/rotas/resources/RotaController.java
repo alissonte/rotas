@@ -1,4 +1,4 @@
-package com.rota.resources;
+package com.rotas.resources;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.rota.model.Rota;
-import com.rota.model.RotaService;
+import com.rotas.model.Rota;
+import com.rotas.model.RotaService;
 
 @RestController
 public class RotaController {	

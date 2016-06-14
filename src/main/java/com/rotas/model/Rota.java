@@ -1,4 +1,4 @@
-package com.rota.model;
+package com.rotas.model;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -16,7 +16,9 @@ public class Rota implements Serializable{
 	
 	private String destino;
 	
-	private List<Parada> paradas;
+	//private List<Parada> paradas;
+	
+	private Parada parada;
 	
 	public Rota() {
 	}
@@ -53,11 +55,19 @@ public class Rota implements Serializable{
 		return destino;
 	}
 
-	public List<Parada> getParadas() {
+	/*public List<Parada> getParadas() {
 		return paradas;
 	}
 
 	public void setParadas(List<Parada> paradas) {
 		this.paradas = paradas;
+	}*/
+	
+	public void setParada(Parada parada) {
+		this.parada = parada;
+	}
+	
+	public Parada getParada() {
+		return parada;
 	}
 }

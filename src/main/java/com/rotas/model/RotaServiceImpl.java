@@ -1,4 +1,4 @@
-package com.rota.model;
+package com.rotas.model;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,7 +19,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.rota.repo.RotaRepositorio;
+import com.rotas.repo.RotaRepositorio;
+import com.rotas.utils.RotaUtil;
 
 @Component
 public class RotaServiceImpl implements RotaService{
@@ -41,12 +42,9 @@ public class RotaServiceImpl implements RotaService{
 		try {
 			origem = retornaLatitudeLongitude(rota.getOrigem());
 			destino = retornaLatitudeLongitude(rota.getDestino());
-			
-			List<Parada> paradas = calculaRota(origem, destino);
-			rota.setParadas(paradas);
-			
+			Parada p1 = novaParada(origem, destino);
+			rota.setParada(p1);
 			return rotaRepositorio.save(rota);
-			
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
@@ -58,10 +56,20 @@ public class RotaServiceImpl implements RotaService{
 		}
 		return null;
 	}
+
+	private Parada novaParada(Parada origem, Parada destino)
+			throws MalformedURLException, UnsupportedEncodingException, IOException, ProtocolException {
+		Parada p1 = new Parada();
+		p1.setLatlngs(calculaRota2(origem, destino));
+		p1.setColor(RotaUtil.COLOR_RED);
+		p1.setWeight(RotaUtil.WEIGHT);
+		return p1;
+	}
 	
 	
 	private List<Parada> calculaRota(Parada origem, Parada destino) throws MalformedURLException, UnsupportedEncodingException, IOException, ProtocolException {
 		List<Parada> resultado = new ArrayList<Parada>();
+		List<LatLng> latLngs = new ArrayList<>();
 		resultado.add(origem);
 		String directionJson = retornaJsonDirection(origem, destino);
 		
@@ -87,10 +95,55 @@ public class RotaServiceImpl implements RotaService{
         	fim = (JsonObject)step.getAsJsonObject().get("end_location");
         	lat = fim.get("lat").getAsDouble();
         	lng = fim.get("lng").getAsDouble();
+        	
+        	LatLng latLng = new LatLng(lat, lng);
+        	
         	resultado.add(new Parada(lat, lng));
+        	latLngs.add(latLng);
         }
         resultado.add(destino);
 		return resultado;
+	}
+	
+	private List<LatLng> calculaRota2(Parada origem, Parada destino) throws MalformedURLException, UnsupportedEncodingException, IOException, ProtocolException {		
+		List<LatLng> latLngs = new ArrayList<>();
+		
+		latLngs.add(new LatLng(origem.getLat(), origem.getLng()));
+		
+		String directionJson = retornaJsonDirection(origem, destino);
+		
+		JsonParser jsonParser = new JsonParser();
+        JsonObject jo = (JsonObject)jsonParser.parse(directionJson);
+		
+        JsonArray jsonArr = jo.getAsJsonArray("routes");
+        JsonObject jo2 = (JsonObject)jsonArr.get(0);
+        
+        JsonArray legs = jo2.getAsJsonArray("legs");
+        JsonObject objectLeg = (JsonObject)legs.get(0);
+        
+        JsonArray steps = objectLeg.getAsJsonArray("steps");
+        
+        JsonObject inicio, fim;
+        double lat, lng;
+        
+        for(JsonElement step : steps){
+        	inicio = (JsonObject)step.getAsJsonObject().get("start_location");
+        	lat = inicio.get("lat").getAsDouble();
+        	lng = inicio.get("lng").getAsDouble();
+        	
+        	LatLng latLng = new LatLng(lat, lng);
+        	latLngs.add(latLng);
+        	
+        	fim = (JsonObject)step.getAsJsonObject().get("end_location");
+        	lat = fim.get("lat").getAsDouble();
+        	lng = fim.get("lng").getAsDouble();
+        	
+        	latLng = new LatLng(lat, lng);        	
+        	
+        	latLngs.add(latLng);
+        }
+        latLngs.add(new LatLng(destino.getLat(), destino.getLng()));
+		return latLngs;
 	}
 	
 	private Parada retornaLatitudeLongitude(String endereco) 
@@ -114,7 +167,7 @@ public class RotaServiceImpl implements RotaService{
 	
 	private String retornaJsonDirection(Parada origem, Parada destino)
 			throws MalformedURLException, UnsupportedEncodingException, IOException, ProtocolException {
-		URL url = new URL(GOOGLE_DIRECTION + "&origin="+origem.getLatitude()+"," + origem.getLongitude()+"&destination="+destino.getLatitude() + "," + destino.getLongitude());
+		URL url = new URL(GOOGLE_DIRECTION + "&origin="+origem.getLat()+"," + origem.getLng()+"&destination="+destino.getLat() + "," + destino.getLng());
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		conn.setRequestMethod("GET");
 		conn.setRequestProperty("Accept", "application/json");

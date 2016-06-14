@@ -1,4 +1,4 @@
-package com.rota.model;
+package com.rotas.model;
 
 public interface RotaService {
 	

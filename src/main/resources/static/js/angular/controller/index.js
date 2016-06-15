@@ -1,24 +1,8 @@
-rotaApp.controller('IndexController', ['$scope','$location','recursoRota',
-	function($scope,$location, recursoRota) {
-
-    $scope.paths = {};
-    $scope.path = {};
+rotaApp.controller('IndexController', ['$scope','$location','recursoRota', function($scope,$location, recursoRota) {
 
 	recursoRota.listarRota(function(rotas) {
-        angular.forEach(rotas, function(value, key){
-            value.paths = {};
-            value.paths.p1 = value.parada;
-        
-        });
-
-        angular.forEach(rotas, function(value, key){
-            value.inicio = {};
-
-            value.inicio.lat = value.parada.latlngs[0].lat;
-            value.inicio.lng = value.parada.latlngs[0].lng;
-            value.inicio.zoom = 16;
-        });
-
+        parsePaths(rotas);
+        parserPathInicio(rotas);
         $scope.rotas = rotas;
 	},function(error){
 		console.log(error);
@@ -28,6 +12,27 @@ rotaApp.controller('IndexController', ['$scope','$location','recursoRota',
 		$scope.toggle = !$scope.toggle;
 		recursoRota.salvarRota(rota, function(rota) {
 			$scope.rotas.push(rota);
+            parsePaths($scope.rotas);
+            parserPathInicio($scope.rotas);
 		});
 	};
+
+    var parsePaths = function(rotas){
+        angular.forEach(rotas, function(value, key){
+            value.paths = {};
+            value.paths.p1 = value.step;
+        
+        });        
+    };
+
+    var parserPathInicio = function(rotas){
+        angular.forEach(rotas, function(value, key){
+            value.inicio = {};
+
+            value.inicio.lat = value.step.latlngs[0].lat;
+            value.inicio.lng = value.step.latlngs[0].lng;
+            value.inicio.zoom = 16;
+        });
+    };
+    
 }]);

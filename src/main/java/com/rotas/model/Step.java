@@ -5,40 +5,37 @@ import java.util.List;
 
 import org.springframework.data.annotation.Transient;
 
-public class Parada implements Serializable{
+public class Step implements Serializable{
 	
-	private static final long serialVersionUID = 413449609222225598L;
+	private static final long serialVersionUID = 413449609222225598L;	
 	
-	@Transient
-	private String nome;	
+	private String name;	
 	
 	private String color;
 	
 	private Integer weight;
 	
-	private List<LatLng> latlngs;
+	private List<LatLng> latlngs;	
 	
-	@Transient
 	private double lat;
 	
-	@Transient
 	private double lng;
 	
-	public Parada() {
+	public Step() {
 	}
 	
-	public Parada(double lat, double lng){
+	public Step(double lat, double lng){
 		this.lat = lat;
 		this.lng = lng;
 	}
 	
-	public Parada(String nome, double lat, double lng){
+	public Step(String name, double lat, double lng){
 		this(lat, lng);
-		this.nome = nome;
+		this.name = name;
 	}
 	
-	public void setLatlngs(List<LatLng> pontos) {
-		this.latlngs = pontos;
+	public void setLatlngs(List<LatLng> latlngs) {
+		this.latlngs = latlngs;
 	}
 	
 	public List<LatLng> getLatlngs() {
@@ -46,11 +43,11 @@ public class Parada implements Serializable{
 	}
 
 	public String getNome() {
-		return nome;
+		return name;
 	}
 
 	public void setNome(String nome) {
-		this.nome = nome;
+		this.name = nome;
 	}
 
 	public double getLat() {

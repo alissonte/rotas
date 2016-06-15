@@ -7,24 +7,24 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.rotas.model.Rota;
-import com.rotas.model.RotaService;
+import com.rotas.model.Route;
+import com.rotas.model.RouteService;
 
 @RestController
-public class RotaController {	
+public class RouteController {	
 	
 	@Autowired
-	private RotaService rotaService;
+	private RouteService rotaService;
 	
 	@ResponseBody
 	@RequestMapping(value="/rotas", method = RequestMethod.GET)
-	public Iterable<Rota> listar(){
+	public Iterable<Route> listar(){
 		return rotaService.findAll();
 	}
 	
 	
 	@RequestMapping(value="/rotas/salvar", method = RequestMethod.POST)
-	public Rota salvar(@RequestBody final Rota novaRota){		
+	public Route salvar(@RequestBody final Route novaRota){		
 		return rotaService.save(novaRota);		
 	}
 

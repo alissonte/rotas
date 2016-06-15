@@ -18,13 +18,13 @@ public class RouteController {
 	
 	@ResponseBody
 	@RequestMapping(value="/rotas", method = RequestMethod.GET)
-	public Iterable<Route> listar(){
+	public Iterable<Route> list(){
 		return rotaService.findAll();
 	}
 	
 	
 	@RequestMapping(value="/rotas/salvar", method = RequestMethod.POST)
-	public Route salvar(@RequestBody final Route novaRota){		
+	public Route save(@RequestBody final Route novaRota){		
 		return rotaService.save(novaRota);		
 	}
 

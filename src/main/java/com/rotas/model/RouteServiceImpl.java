@@ -5,7 +5,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ public class RouteServiceImpl implements RouteService{
 			Step p1 = newStep(origem, destino);
 			rota.setStep(p1);
 			return routeRepository.save(rota);
-		} catch (Exception e){
+		} catch (Exception e){//TODO tratar exceções mais especificas
 			System.out.println(e.getMessage());
 		}
 		return null;
@@ -55,11 +55,29 @@ public class RouteServiceImpl implements RouteService{
 	 * @throws Exception
 	 */
 	private Step newStep(Step origem, Step destino)throws Exception {
-		Step p1 = new Step();
-		p1.setLatlngs(calculateRoute(origem, destino));
-		p1.setColor(RouteUtil.COLOR_RED);
-		p1.setWeight(RouteUtil.WEIGHT);
-		return p1;
+		Step step = new Step();
+		step.setLatlngs(calculateRoute(origem, destino));
+		step.setColor(RouteUtil.COLOR_RED);
+		step.setWeight(RouteUtil.WEIGHT);
+		return step;
+	}
+	
+	/**
+	 * 
+	 * @param address
+	 * @return
+	 * @throws Exception
+	 */
+	private Step receiveLatLng(String address) throws Exception{
+		String url = GOOGLE_PARADA + URLEncoder.encode(address, "UTF-8") + "&sensor=true";
+		String googleJson = formatJson(url);
+		
+		JsonObject locations = getLocationPoint(googleJson);
+    	
+    	double lat = locations.get("lat").getAsDouble();
+    	double lng = locations.get("lng").getAsDouble();
+    	
+    	return new Step(address, lat, lng);
 	}
 	
 	/**
@@ -69,29 +87,28 @@ public class RouteServiceImpl implements RouteService{
 	 * @return
 	 * @throws Exception
 	 */
-	private List<LatLng> calculateRoute(Step origem, Step destino) throws Exception {		
-		List<LatLng> latLngs = new ArrayList<>();
+	private List<LatLng> calculateRoute(Step origem, Step destino) throws Exception {
+		JsonObject start, end;
+        double lat, lng;
+		List<LatLng> latLngs = new LinkedList<>();
 			
 		String url = GOOGLE_DIRECTION + "&origin="+origem.getLat()+"," + origem.getLng()+"&destination="+destino.getLat() + "," + destino.getLng();
 		String directionJson = formatJson(url);
 		
 		JsonArray steps = getAllSteps(directionJson);
         
-        JsonObject inicio, fim;
-        double lat, lng;
-        
         latLngs.add(new LatLng(origem.getLat(), origem.getLng()));	
         for(JsonElement step : steps){
-        	inicio = (JsonObject)step.getAsJsonObject().get("start_location");
-        	lat = inicio.get("lat").getAsDouble();
-        	lng = inicio.get("lng").getAsDouble();
+        	start = (JsonObject)step.getAsJsonObject().get("start_location");
+        	lat = start.get("lat").getAsDouble();
+        	lng = start.get("lng").getAsDouble();
         	
         	LatLng latLng = new LatLng(lat, lng);
         	latLngs.add(latLng);
         	
-        	fim = (JsonObject)step.getAsJsonObject().get("end_location");
-        	lat = fim.get("lat").getAsDouble();
-        	lng = fim.get("lng").getAsDouble();
+        	end = (JsonObject)step.getAsJsonObject().get("end_location");
+        	lat = end.get("lat").getAsDouble();
+        	lng = end.get("lng").getAsDouble();
         	
         	latLng = new LatLng(lat, lng);
         	
@@ -120,24 +137,6 @@ public class RouteServiceImpl implements RouteService{
 		return steps;
 	}
 	
-	
-	/**
-	 * 
-	 * @param endereco
-	 * @return
-	 * @throws Exception
-	 */
-	private Step receiveLatLng(String endereco) throws Exception{
-		String url = GOOGLE_PARADA + URLEncoder.encode(endereco, "UTF-8") + "&sensor=true";
-		String googleJson = formatJson(url);
-		
-		JsonObject locations = getLocationPoint(googleJson);
-    	
-    	double lat = locations.get("lat").getAsDouble();
-    	double lng = locations.get("lng").getAsDouble();
-    	
-    	return new Step(endereco, lat, lng);
-	}
 	
 	/**
 	 * 

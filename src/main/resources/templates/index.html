@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="rotaApp">
+<html ng-app="rotaApp" xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="utf-8"/>
 	    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
@@ -45,7 +45,7 @@
 	        <div class="col-md-4" ng-repeat="rota in rotas">
 	          <h2>{{rota.name}}</h2>
 	          <leaflet lf-center="rota.inicio" paths="rota.paths" width="100%" height="240px"></leaflet>
-	          <p><a class="btn btn-secondary" href="#" role="button">Detalhar mapa &raquo;</a></p>
+	          <p><a class="btn btn-secondary" href="detail.html" th:href="@{/detail}" role="button">Detalhar mapa &raquo;</a></p>	          	          
 	        </div>
 	      </div>
 	    </div>  

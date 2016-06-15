@@ -11,4 +11,9 @@ public class MainController {
 	public String homepage() {
 		return "index";
 	}
+	
+	@RequestMapping(value = "/detail", method = RequestMethod.GET)
+	public String detail() {
+		return "detail";
+	}
 }
